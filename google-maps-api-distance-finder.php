@@ -57,10 +57,16 @@ if ( ! defined( 'ABSPATH' ) ) {
   
   $destinations_array = str_getcsv($destinations, '|');
   
+  
+  
   if($min_value == -1)
-   return "NOT_FOUND";
-  else
-   return $destinations_array[$counter];
+   $req_response['status'] =  "NOT_FOUND";
+  else{
+   $req_response['status'] =  "OK";
+   $req_response['nearest_point'] =  "$destinations_array[$counter]";
+  }
+  
+   return json_encode($req_response);
 }
  
 ?>
