@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
    $req_response['nearest_point'] =  "$destinations_array[$counter]";
   }
   
-   return json_encode($req_response);
+   return $req_response;
 }
  
 ?>
