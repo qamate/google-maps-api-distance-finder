@@ -29,6 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
   $key = $data->get_param('key');
   $origins = $data->get_param('origins');
   $destinations = $data->get_param('destinations');
+  $debug = $data->get_param('debug');
   
   $response_json = file_get_contents("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" . $origins . "&destinations=" . $destinations . "&key=" . $key . "&units=" . $units);
   
@@ -36,6 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
   
   $counter = 0;
   $min_value = -2;
+  $nearest_point = 0;
   
   foreach($response_array['rows'][0]['elements'] as $value){
    if($value['status'] == 'NOT_FOUND'){
@@ -44,27 +46,37 @@ if ( ! defined( 'ABSPATH' ) ) {
     break;
    }
    
+   if($value['status'] != 'OK')
+    continue;
+   
+   $destinations_array = str_getcsv($destinations, '|');
+   
    if($min_value == -2){
     $min_value = $value['distance']['value'];
    }
    else{
-    if($value['distance']['value'] < $min_value){
+    $log .= " Comparing " . $value['distance']['value'] . " with " .  $min_value . "\n";
+    if($value['distance']['value'] <= $min_value){
      $min_value = $value['distance']['value'];
-     $counter++;
+     $log .= " Min value found: " . $min_value;
+     $nearest_point = $destinations_array[$counter];
+     $log .= " Nearest Point: " . $nearest_point;
     }
    }
+   $counter++;
   }
-  
-  $destinations_array = str_getcsv($destinations, '|');
-  
-  
   
   if($min_value == -1)
    $req_response['status'] =  "NOT_FOUND";
   else{
    $req_response['status'] =  "OK";
-   $req_response['nearest_point'] =  "$destinations_array[$counter]";
+   $req_response['nearest_point'] =  $nearest_point;
   }
+  
+  if($debug == "true")
+   $req_response = json_decode($response_json);
+   
+   //$req_response['log'] = $log; //uncomment this if you want to see log
   
    return $req_response;
 }
