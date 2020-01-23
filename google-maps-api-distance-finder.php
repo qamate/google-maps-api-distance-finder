@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
    $counter++;
   }
   
-  if($min_value == -1)
+  if($min_value == -1 || $nearest_point ==0)
    $req_response['status'] =  "NOT_FOUND";
   else{
    $req_response['status'] =  "OK";
